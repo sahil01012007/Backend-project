@@ -1,7 +1,6 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-
 
 const userSchema = new Schema(
     {
@@ -50,23 +49,24 @@ const userSchema = new Schema(
     {
         timestamps: true
     }
-)
-
+);
 
 userSchema.pre("save", async function (next) {       // pre is a hook
-    if(!this.isModified("password")) return next();
+    if (!this.isModified("password")) return next();
 
-    this.password = bcrypt.hash(this.password, 10)
-})
+    try {
+        this.password = await bcrypt.hash(this.password, 10);
+        next();
+    } catch (error) {
+        next(error); // Pass the error to the next middleware
+    }
+});
 
+userSchema.methods.isPasswordCorrect = async function(password) {
+    return await bcrypt.compare(password, this.password);
+};
 
-userSchema.methods.isPasswordCorrect = async function
-(password) {
-    return await bcrypt.compare(password, this.password)
-}
-
-
-userSchema.methods.generateAccessToken = function(){
+userSchema.methods.generateAccessToken = function() {
     return jwt.sign(
         {
             _id: this._id,
@@ -77,11 +77,10 @@ userSchema.methods.generateAccessToken = function(){
         {
             expiresIn: process.env.ACCESS_TOKEN_EXPIRY
         }
-    )
-}
+    );
+};
 
-
-userSchema.methods.generateRefreshToken = function(){
+userSchema.methods.generateRefreshToken = function() {
     return jwt.sign(
         {
             _id: this._id,                                   // refresh token m info kam hoti h
@@ -90,8 +89,7 @@ userSchema.methods.generateRefreshToken = function(){
         {
             expiresIn: process.env.REFRESH_TOKEN_EXPIRY
         }
-    )
-}
+    );
+};
 
-
-export const User = mongoose.model("User", userSchema)
+export const User = mongoose.model("User", userSchema);
