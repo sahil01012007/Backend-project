@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from  "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
+import {v2 as cloudinary} from "cloudinary";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
@@ -169,7 +170,7 @@ const logoutUser = asyncHandler(async(req, res) => {
       req.user._id,
       {
          $set: {
-            refreshToken: undefined
+            refreshToken: null    // undefined also can be used here
          }
       },
       {
@@ -269,10 +270,13 @@ const getCurrentUser = asyncHandler(async(req, res) => {
 
 const updateAccountDetails = asyncHandler(async(req, res) => {                                   
    const {fullName, email} = req.body
+   
 
    if (!fullName || !email) {
       throw new ApiError(400, "All fields are required")
    }
+   console.log("req.user._id: ",req.user._id );
+   
 
    const user = await User.findByIdAndUpdate(
       req.user?._id,
@@ -304,6 +308,8 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
    }
 
    const user = await User.findById(req.user?._id);
+   console.log(req.user?._id);
+   
 
     if (!user) {
         throw new ApiError(404, "User not found");
@@ -316,7 +322,8 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
     }
 
     user.avatar = avatar.url;
-    await user.save({validateBeforeSave: false}).select("-password")
+    await user.save({validateBeforeSave: false})           // No, you cannot use await user.select("-password")  because .select() only works on queries, not on Mongoose documents.
+    const updatedUser = await User.findById(user?._id).select("-password");
 
 
    return res
