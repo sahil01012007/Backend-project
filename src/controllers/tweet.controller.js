@@ -7,7 +7,7 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 
 const createTweet = asyncHandler(async (req, res) => {
     //TODO: create tweet
-    console.log(req.user);
+    // console.log(req.user);
     
     const tweetContent = req.body.content
     
@@ -19,7 +19,7 @@ const createTweet = asyncHandler(async (req, res) => {
         content: tweetContent,
         owner: req.user._id
     })
-    console.log("tweet created successfully");
+    // console.log("tweet created successfully");
     
     if (!createdTweet) {
         throw new ApiError(404, "Something went wrong while creating the tweet");
