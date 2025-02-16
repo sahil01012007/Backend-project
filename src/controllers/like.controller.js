@@ -23,7 +23,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
             
             return res
             .status(200)
-            .json( new ApiResponse(200,existingLike , "unliked successfully" ));
+            .json( new ApiResponse(200,null , "unliked successfully" ));
         }
     
         // Like: Create a new like document
@@ -59,7 +59,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 
             return res
             .status(200)
-            .json( new ApiResponse(200,existingLike , "unliked successfully" ));
+            .json( new ApiResponse(200,null , "unliked successfully" ));
         }
 
         const newLike = await Like.create({ comment: commentId, likedBy: userId})
@@ -95,7 +95,7 @@ try {
     
            return res
            .status(200)
-           .json( new ApiResponse(200, existingLike, "unliked successfully" ));
+           .json( new ApiResponse(200, null, "unliked successfully" ));
         }
     
         const newLike = await Like.create({tweet: tweetId, likedBy: userId})
