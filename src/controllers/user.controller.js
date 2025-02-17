@@ -37,24 +37,24 @@ const registerUser = asyncHandler( async (req, res) => {
      // return res
      
      
-     const {fullName, email, userName, password} = req.body
+     const {fullName, email, username, password} = req.body
      console.log("req.body", req.body);
      
 
      if (
-        [fullName, email, userName, password].some((field) =>
+        [fullName, email, username, password].some((field) =>
             field?.trim() === "")
      ) {
         throw new ApiError(400, "Please fill in all fields");
      } 
      
      const existedUser = await User.findOne({
-        $or: [{ userName }, { email }],
+        $or: [{ username }, { email }],
      });
      console.log(existedUser);
      
      if (existedUser) {
-        throw new ApiError(400, "Username or email already exists");
+        throw new ApiError(400, "username or email already exists");
      };
      
 
@@ -86,7 +86,7 @@ const registerUser = asyncHandler( async (req, res) => {
         coverImage: coverImage?.url || "",
         email,
         password,
-        userName: userName.toLowerCase()
+        username: username.toLowerCase()
      });
      console.log("User created successfully !!");
      
@@ -113,16 +113,16 @@ const loginUser = asyncHandler(async (req, res) => {
    // accessToken and refreshToken
    // send cookie
 
-   const {email, userName, password} = req.body;
+   const {email, username, password} = req.body;
    console.log("req.body: ", req.body);
    
 
-   if (!userName && !email) {
+   if (!username && !email) {
       throw new ApiError(400, "Email or username is required")
    }
 
    const user = await User.findOne({
-      $or: [{email}, {userName}],
+      $or: [{email}, {username}],
    })
 
    if (!user) {
@@ -364,18 +364,18 @@ const updateUserCoverImage = asyncHandler(async(req, res) => {
 })
 
 const getUserChannelProfile = asyncHandler(async(req, res) => {
-   const {userName} = req.params;
+   const {username} = req.params;
    console.log(req.params);
    
 
-   if (!userName?.trim()) {
+   if (!username?.trim()) {
       throw new ApiError(400, "username is missing")
    }
 
    const channel = await User.aggregate([
       {
          $match: {               // filter documents based on specified conditions
-            userName: userName?.toLowerCase()
+            username: username?.toLowerCase()
          }
       },
       {
@@ -414,7 +414,7 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
       {
          $project: {
             fullName: 1,
-            userName: 1,
+            username: 1,
             subscribersCount: 1,
             subscribedToCount: 1,
             isSubscribed: 1,
@@ -463,7 +463,7 @@ const getWatchHistory = asyncHandler(async(req, res) => {
                         {
                            $project: {
                               fullName: 1,
-                              userName: 1,
+                              username: 1,
                               avatar: 1
                            }
                         }
