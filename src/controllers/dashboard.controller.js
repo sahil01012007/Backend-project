@@ -19,11 +19,10 @@ const getChannelStats = asyncHandler(async (req, res) => {
             $match: {
                 channel: userId,
             }
-        },
-        {
-            $count: "subscriberCount"
         }
     ])
+    // console.log(userChannelSubscribers);
+    
 
 
     const allVideos = await Video.aggregate([
